@@ -23,6 +23,11 @@ function execute(func, limit_x1, limit_x2, iterations, probability, nest_number)
     console.log('func', func(best));
 
 
+    let size = 500;
+    let step_number = 500;
+    plotFunction(limit_x1, limit_x2, size, step_number);
+
+
     
 }
 
