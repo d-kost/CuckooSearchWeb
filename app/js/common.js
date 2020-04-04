@@ -2,7 +2,9 @@ let lower_x1 = -15;
 let upper_x1 = -5;
 let lower_x2 = -3;
 let upper_x2 = 3;
-execute(bukin, [lower_x1, upper_x1], [lower_x2, upper_x2], 100, 0.5, 20);
+
+let f = library.booth.func;
+execute(f, [lower_x1, upper_x1], [lower_x2, upper_x2], 100, 0.5, 20);
 
 
 function execute(func, limit_x1, limit_x2, iterations, probability, nest_number) {
@@ -34,7 +36,7 @@ function execute(func, limit_x1, limit_x2, iterations, probability, nest_number)
 
     let size = 200;
     let step_number = 200;
-    plotFunction(limit_x1, limit_x2, size, step_number, best.concat(value));
+    plotFunction(func, limit_x1, limit_x2, size, step_number, best.concat(value));
 
     setInfo({
         Function: func,
@@ -110,6 +112,6 @@ function findWorstNests(func, nests) {
 }
 
 
-function bukin(x) {
-    return 100*Math.sqrt(Math.abs(x[1]-0.01*x[0]*x[0])) + 0.01*Math.abs(x[0] + 10)
-}
+// function bukin(x) {
+//     return 100*Math.sqrt(Math.abs(x[1]-0.01*x[0]*x[0])) + 0.01*Math.abs(x[0] + 10)
+// }

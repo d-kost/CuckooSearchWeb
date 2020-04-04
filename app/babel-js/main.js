@@ -6,7 +6,9 @@ var lower_x1 = -15;
 var upper_x1 = -5;
 var lower_x2 = -3;
 var upper_x2 = 3;
-execute(bukin, [lower_x1, upper_x1], [lower_x2, upper_x2], 100, 0.5, 20);
+
+var f = library.booth.func;
+execute(f, [lower_x1, upper_x1], [lower_x2, upper_x2], 100, 0.5, 20);
 
 function execute(func, limit_x1, limit_x2, iterations, probability, nest_number) {
 
@@ -33,7 +35,7 @@ function execute(func, limit_x1, limit_x2, iterations, probability, nest_number)
 
     var size = 200;
     var step_number = 200;
-    plotFunction(limit_x1, limit_x2, size, step_number, best.concat(value));
+    plotFunction(func, limit_x1, limit_x2, size, step_number, best.concat(value));
 
     setInfo({
         Function: func,
@@ -100,10 +102,85 @@ function findWorstNests(func, nests) {
     return temp_arr;
 }
 
-function bukin(x) {
-    return 100 * Math.sqrt(Math.abs(x[1] - 0.01 * x[0] * x[0])) + 0.01 * Math.abs(x[0] + 10);
-}
-function plotFunction(limit_x1, limit_x2, size, step_number, best_coord) {
+// function bukin(x) {
+//     return 100*Math.sqrt(Math.abs(x[1]-0.01*x[0]*x[0])) + 0.01*Math.abs(x[0] + 10)
+// }
+var library = {
+    mccormick: {
+        show: 'sin(x1 + x2) + (x1 - x2)^2 = 1.5x1 + 2.5x2 + 1',
+        func: function func(x) {
+            return Math.sin(x[0] + x[1]) + Math.pow(x[0] - x[1], 2) - 1.5 * x[0] * 2.5 * x[1] + 1;
+        }
+    },
+
+    goldstein_price: {
+        show: '[1 + (x1 + x2 + 1)^2 * (19 - 14x1 + 3x1^2 - 14x2 + 6x1x2 ' + '+ 3x2^2)] * [30 + (2x1 - 3x2)^2 * (18 - 32x1 + 12x1^2 + 48x2 - ' + '36x1x2 + 27x2^2)]',
+        func: function func(x) {
+            var first_part = 1 + Math.pow(x[0] + x[1] + 1, 2) * (19 - 14 * x[0] + 3 * x[0] * x[0] - 14 * x[1] + 6 * x[0] * x[1] + 3 * x[1] * x[1]);
+            var second_part = 30 + Math.pow(2 * x[0] - 3 * x[1], 2) * (18 - 32 * x[0] + 12 * x[0] * x[0] + 48 * x[1] - 36 * x[0] * x[1] + 27 * x[1] * x[1]);
+            return first_part * second_part;
+        }
+    },
+
+    schwefel_two_dimensional: {
+        show: '418.9829*2 - (x1*sin(sqrt(abs(x1))) + x2*sin(sqrt(abs(x2))))',
+        func: function func(x) {
+            return 418.9829 * 2 - (x[0] * Math.sin(Math.sqrt(Math.abs(x[0]))) + x[1] * Math.sin(Math.sqrt(Math.abs(x[1]))));
+        }
+    },
+
+    rosenbrock_two_dimensional: {
+        show: '[100*(x2 - x1^2)^2 + (x1 - 1)^2]',
+        func: function func(x) {
+            return 100 * Math.pow(x[1] - x[0] * x[0], 2) + Math.pow(x[0] - 1, 2);
+        }
+    },
+
+    bukin: {
+        show: '100*sqrt(abs(x2 - 0.01x1^2)) + 0.01 * abs(x1 + 10)',
+        func: function func(x) {
+            return 100 * Math.sqrt(Math.abs(x[1] - 0.01 * x[0] * x[0])) + 0.01 * Math.abs(x[0] + 10);
+        }
+    },
+
+    cross_in_tray: {
+        show: '-0.0001 * ( abs( sin(x1)sin(x2)exp( abs(100 - (sqrt( x1^2 + x2^2 )) / PI) ) ) + 1 )^(0.1)',
+        func: function func(x) {
+            var exp_entry = Math.abs(100 - Math.sqrt(x[0] * x[0] + x[1] * x[1]) / Math.PI);
+            var part = Math.sin(x[0]) * Math.sin(x[1]) * Math.exp(exp_entry);
+
+            return -0.0001 * Math.pow(Math.abs(part) + 1, 0.1);
+        }
+    },
+
+    drop_wave: {
+        show: '- ( 1 + cos( 12 * sqrt(x1^2 + x2^2) ) ) / ( 0.5 * (x1^2 + x2^2) + 2 )',
+        func: function func(x) {
+            var first_part = 1 + Math.cos(12 * Math.sqrt(x[0] * x[0] + x[1] * x[1]));
+            var second_part = 0.5 * (x[0] * x[0] + x[1] * x[1]) + 2;
+            return -(first_part / second_part);
+        }
+    },
+
+    eggholder: {
+        show: '',
+        func: function func(x) {
+            var first_part = Math.sin(Math.sqrt(Math.abs(x[1] + x[0] / 2 + 47)));
+            var second_part = x[0] * Math.sin(Math.sqrt(Math.abs(x[0] - (x[1] + 47))));
+
+            return -(x[1] + 47) * first_part - second_part;
+        }
+    },
+
+    booth: {
+        show: '',
+        func: function func(x) {
+            return Math.pow(x[0] + 2 * x[1] - 7, 2) + Math.pow(2 * x[0] + x[1] - 5, 2);
+        }
+    }
+
+};
+function plotFunction(func, limit_x1, limit_x2, size, step_number, best_coord) {
     console.log('sdgzdg', best_coord);
 
     var plot_holder = document.getElementById('plot-holder');
@@ -111,7 +188,7 @@ function plotFunction(limit_x1, limit_x2, size, step_number, best_coord) {
         x2 = [],
         z = [];
 
-    var _createCoordForSurfac = createCoordForSurface(limit_x1, limit_x2, size, step_number);
+    var _createCoordForSurfac = createCoordForSurface(func, limit_x1, limit_x2, size, step_number);
 
     var _createCoordForSurfac2 = _slicedToArray(_createCoordForSurfac, 3);
 
@@ -164,7 +241,7 @@ function plotFunction(limit_x1, limit_x2, size, step_number, best_coord) {
     Plotly.newPlot(plot_holder, data, layot, config);
 }
 
-function createCoordForSurface(limit_x1, limit_x2, size, step_number) {
+function createCoordForSurface(func, limit_x1, limit_x2, size, step_number) {
     var z = [];
 
     var _getXCoord = getXCoord(limit_x1, limit_x2, size, step_number),
@@ -175,7 +252,7 @@ function createCoordForSurface(limit_x1, limit_x2, size, step_number) {
     for (var i = 0; i < size; i++) {
         z[i] = [];
         for (var j = 0; j < step_number; j++) {
-            z[i].push(bukin([x1[i][j], x2[i][j]]));
+            z[i].push(func([x1[i][j], x2[i][j]]));
         }
     }
 

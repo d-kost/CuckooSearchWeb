@@ -1,11 +1,11 @@
-function plotFunction(limit_x1, limit_x2, size, step_number, best_coord) {
+function plotFunction(func, limit_x1, limit_x2, size, step_number, best_coord) {
     console.log('sdgzdg', best_coord);
     
 
     let plot_holder = document.getElementById('plot-holder');
     let x1 = [], x2 = [], z = [];
 
-    [x1, x2, z] = createCoordForSurface(limit_x1, limit_x2, size, step_number);
+    [x1, x2, z] = createCoordForSurface(func, limit_x1, limit_x2, size, step_number);
 
     let data = [{
         z: z,
@@ -52,14 +52,14 @@ function plotFunction(limit_x1, limit_x2, size, step_number, best_coord) {
 
 }
 
-function createCoordForSurface(limit_x1, limit_x2, size, step_number) {
+function createCoordForSurface(func, limit_x1, limit_x2, size, step_number) {
     let z = []
     let [x1, x2] = getXCoord(limit_x1, limit_x2, size, step_number);
 
     for (let i = 0; i < size; i++) {
         z[i] = [];
         for (let j = 0; j < step_number; j++) {
-        z[i].push(bukin([x1[i][j], x2[i][j]]));
+        z[i].push(func([x1[i][j], x2[i][j]]));
         }
     }
 
