@@ -6,8 +6,30 @@ body {
   width: 80%;
 }
 
+.container {
+  display: flex;
+}
+
 #plot-holder {
   width: 500px;
   height: 500px;
   border: 2px solid #dedede;
+}
+
+.info-block {
+  padding-left: 40px;
+}
+
+.info-list {
+  padding-left: 0;
+}
+
+.info-list__item {
+  list-style: none;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.info-list__title {
+  font-weight: 600;
 }

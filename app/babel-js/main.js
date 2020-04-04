@@ -18,15 +18,31 @@ function execute(func, limit_x1, limit_x2, iterations, probability, nest_number)
     for (var i = 0; i < iterations; i++) {
 
         nests = process_iteration(func, nests, probability, limit_x1, limit_x2);
-        best = findBestSolution(func, nests);
+        var temp = findBestSolution(func, nests);
+        if (temp < best) {
+            best = temp;
+        }
     }
 
-    console.log('best', best);
-    console.log('func', func(best));
+    var value = func(best);
 
-    var size = 500;
-    var step_number = 500;
-    plotFunction(limit_x1, limit_x2, size, step_number);
+    console.log('best', best);
+    console.log('func', value);
+
+    setSolution(best, value);
+
+    var size = 200;
+    var step_number = 200;
+    plotFunction(limit_x1, limit_x2, size, step_number, best.concat(value));
+
+    setInfo({
+        Function: func,
+        x1: limit_x1,
+        x2: limit_x2,
+        'Number of iterations': iterations,
+        Probability: probability,
+        'Number of nests': nest_number
+    });
 }
 
 function initNests(limit_x1, limit_x2, nest_number) {
@@ -87,7 +103,8 @@ function findWorstNests(func, nests) {
 function bukin(x) {
     return 100 * Math.sqrt(Math.abs(x[1] - 0.01 * x[0] * x[0])) + 0.01 * Math.abs(x[0] + 10);
 }
-function plotFunction(limit_x1, limit_x2, size, step_number) {
+function plotFunction(limit_x1, limit_x2, size, step_number, best_coord) {
+    console.log('sdgzdg', best_coord);
 
     var plot_holder = document.getElementById('plot-holder');
     var x1 = [],
@@ -109,6 +126,17 @@ function plotFunction(limit_x1, limit_x2, size, step_number) {
         y: x2,
         type: 'surface',
         colorscale: 'Jet'
+    }, {
+        z: [best_coord[2]],
+        x: [best_coord[0]],
+        y: [best_coord[1]],
+        mode: 'markers',
+        marker: {
+            color: 'rgb(0, 0, 0)',
+            size: 8,
+            symbol: 'circle'
+        },
+        type: 'scatter3d'
     }];
 
     var layot = {
@@ -180,4 +208,44 @@ function getXCoord(l_x1, l_x2, row_number, step_number) {
     }
 
     return [x1_coord, x2_coord];
+}
+function setInfo(object) {
+    var info_list = document.querySelector('.info-list');
+    // document.querySelector('#function').append(object[func]);
+    // document.querySelector('#limit_x1').append(object[func]);
+    // document.querySelector('#limit_x2').append(object[func]);
+    // document.querySelector('#probability').append(object[func]);
+    // document.querySelector('#iterations').append(object[func]);
+    // document.querySelector('#nests').append(object[func]);
+    // func, limit_x1, limit_x2, iterations, probability, nest_number
+
+    for (var key in object) {
+        if (object.hasOwnProperty(key)) {
+            var element = object[key];
+
+            if (key == 'x1' || key == 'x2') {
+                element = '[' + element + ']';
+            }
+            info_list.append(createItem(key, element));
+        }
+    }
+}
+
+function setSolution(coord, value) {
+    document.querySelector('.results__coord').append('[' + coord + ']');
+    document.querySelector('.results__value').append(value);
+}
+
+function createItem(title, text) {
+    var li = document.createElement('li');
+    li.className = 'info-list__item';
+
+    var span = document.createElement('span');
+    span.className = 'info-list__title';
+    span.textContent = title + ': ';
+    li.append(span);
+
+    li.append(text);
+
+    return li;
 }

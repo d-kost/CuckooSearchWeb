@@ -1,4 +1,6 @@
-function plotFunction(limit_x1, limit_x2, size, step_number) {
+function plotFunction(limit_x1, limit_x2, size, step_number, best_coord) {
+    console.log('sdgzdg', best_coord);
+    
 
     let plot_holder = document.getElementById('plot-holder');
     let x1 = [], x2 = [], z = [];
@@ -11,6 +13,17 @@ function plotFunction(limit_x1, limit_x2, size, step_number) {
         y: x2,
         type: 'surface',
         colorscale : 'Jet'
+    }, {
+        z: [best_coord[2]],
+        x: [best_coord[0]],
+        y: [best_coord[1]],
+        mode: 'markers',
+        marker: {
+            color: 'rgb(0, 0, 0)',
+            size: 8,
+            symbol: 'circle'
+        },
+        type: 'scatter3d'
     }]
 
     let layot = {

@@ -15,17 +15,35 @@ function execute(func, limit_x1, limit_x2, iterations, probability, nest_number)
     for (let i = 0; i < iterations; i++) {
 
         nests = process_iteration(func, nests, probability, limit_x1, limit_x2);
-        best = findBestSolution(func, nests);
+        let temp = findBestSolution(func, nests);
+        if (temp < best) {
+            best = temp;
+        }
+
 
     }
 
+    
+    let value = func(best);
+
     console.log('best', best);
-    console.log('func', func(best));
+    console.log('func', value);
+
+    setSolution(best, value);
 
 
-    let size = 500;
-    let step_number = 500;
-    plotFunction(limit_x1, limit_x2, size, step_number);
+    let size = 200;
+    let step_number = 200;
+    plotFunction(limit_x1, limit_x2, size, step_number, best.concat(value));
+
+    setInfo({
+        Function: func,
+        x1: limit_x1,
+        x2: limit_x2, 
+        'Number of iterations': iterations,
+        Probability: probability,
+        'Number of nests': nest_number
+    });
 
 
     
