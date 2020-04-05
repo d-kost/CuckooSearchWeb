@@ -148,7 +148,7 @@ var library = {
         limit_x1: [-4, 4],
         limit_x2: [-4, 4],
         func: function func(x) {
-            return Math.sin(x[0] + x[1]) + Math.pow(x[0] - x[1], 2) - 1.5 * x[0] * 2.5 * x[1] + 1;
+            return Math.sin(x[0] + x[1]) + Math.pow(x[0] - x[1], 2) - 1.5 * x[0] + 2.5 * x[1] + 1;
         }
     },
 
