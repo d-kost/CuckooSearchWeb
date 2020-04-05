@@ -14,22 +14,36 @@
         <div id="plot-holder"></div>
 
         <div class="info-block">
-            <h3>Parameters</h4>
+            <h3 class="info-block__title">Parameters</h3>
+
+            <div class="choose-function">
+                <select class="choose-function__select"></select>
+                <button class="choose-function__button">Apply</button>
+            </div>
+                
             <ul class="info-list">
             </ul>
         </div>
     </div>
 
     <div class="results">
-        <p class="results__coord"><span class="results__title">Solution: </span></p>
-        <p class="results__value"><span class="results__title">F(x1, x2) = </span></p>
+        <p>
+            <span class="results__title">Solution: </span>
+            <span class="results__coord"></span>
+        </p>
+        <p>
+            <span class="results__title">F(x1, x2) = </span>
+            <span class="results__value"></span>
+        </p>
     </div>
     
-    
-    <script src="js/plot_function.js"></script>
+
+    <script src="babel-js/main.js"></script>
+    <!-- <script src="js/plot_function.js"></script>
     <script src="js/set_info.js"></script>
     <script src="js/functions_library.js"></script>
-    <script src="js/common.js"></script>
+    <script src="js/algorithm.js"></script>
+    <script src="js/common.js"></script> -->
     
 </body>
 </html>

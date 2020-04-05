@@ -1,6 +1,4 @@
-function plotFunction(func, limit_x1, limit_x2, size, step_number, best_coord) {
-    console.log('sdgzdg', best_coord);
-    
+function plotFunction(func, limit_x1, limit_x2, size, step_number, best_coord) { 
 
     let plot_holder = document.getElementById('plot-holder');
     let x1 = [], x2 = [], z = [];
@@ -64,10 +62,7 @@ function createCoordForSurface(func, limit_x1, limit_x2, size, step_number) {
     }
 
     return [x1, x2, z];
-    
-    // console.log('x1', x1);
-    // console.log('x2', x2);
-    // console.log('z', z);
+
 }
 
 function getXCoord(l_x1, l_x2, row_number, step_number) {

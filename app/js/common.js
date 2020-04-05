@@ -1,117 +1,58 @@
-let lower_x1 = -15;
-let upper_x1 = -5;
-let lower_x2 = -3;
-let upper_x2 = 3;
-
-let f = library.booth.func;
-execute(f, [lower_x1, upper_x1], [lower_x2, upper_x2], 100, 0.5, 20);
-
-
-function execute(func, limit_x1, limit_x2, iterations, probability, nest_number) {
+function onContentLoaded() {
+    setFunctionToSelect(library);
     
-    nests = initNests(limit_x1, limit_x2, nest_number);
-    cuckoo = getUniformCoord(limit_x1, limit_x2);
+    applySelectedFucntion();
 
-    let best = findBestSolution(func, nests);
 
-    for (let i = 0; i < iterations; i++) {
+    document.querySelector('.choose-function__button').addEventListener('click', selectButtonClick);
+}
 
-        nests = process_iteration(func, nests, probability, limit_x1, limit_x2);
-        let temp = findBestSolution(func, nests);
-        if (temp < best) {
-            best = temp;
+function selectButtonClick() {
+    applySelectedFucntion();
+}
+
+function applySelectedFucntion() {
+
+    let selected_name = getSelectedOption();
+    let f = getFunctionByName(selected_name);
+    if (f) {
+        execute(f, 100, 0.5, 20);
+    }
+
+}
+
+
+function setFunctionToSelect(lib) {
+    let select = document.querySelector('.choose-function__select');
+
+    let selected = true;
+    for (const key in lib) {
+        if (lib.hasOwnProperty(key)) {
+            const element = lib[key];
+
+            select.append(createOption(element.name, selected));
+            selected = false;
         }
-
-
     }
-
-    
-    let value = func(best);
-
-    console.log('best', best);
-    console.log('func', value);
-
-    setSolution(best, value);
-
-
-    let size = 200;
-    let step_number = 200;
-    plotFunction(func, limit_x1, limit_x2, size, step_number, best.concat(value));
-
-    setInfo({
-        Function: func,
-        x1: limit_x1,
-        x2: limit_x2, 
-        'Number of iterations': iterations,
-        Probability: probability,
-        'Number of nests': nest_number
-    });
-
-
-    
 }
 
 
-function initNests(limit_x1, limit_x2, nest_number) {
-    let nests = []
-    for (let i = 0; i < nest_number; i++) {
-        nests[i] = getUniformCoord(limit_x1, limit_x2)
+function createOption(text, selected) {
+    let option = document.createElement('option');
+    option.textContent = text;
+    option.value = text;
+    if (selected) {
+        option.setAttribute('selected', 'selected');
     }
-    return nests
+    return option;
 }
 
 
-function getUniformCoord(limit_x1, limit_x2) {
-    return [Math.random()*(limit_x1[1] - limit_x1[0]) + limit_x1[0], 
-        Math.random()*(limit_x2[1] - limit_x2[0]) + limit_x2[0]]
+function getSelectedOption() {
+    let select = document.querySelector('.choose-function__select');
+    return select.options[select.selectedIndex].value;
 }
 
 
-function findBestSolution(func, nests) {
-    let best = nests[0];
 
-    nests.forEach( nest => {
-        if (func(nest) < func(best)) {
-            best = nest;
-        } 
-    })
-    
-    return best;
-}
-
-
-function process_iteration(func, nests, probability, l_x1, l_x2) {
-    let index = Math.floor(Math.random()*nests.length);
-        
-    if (func(cuckoo) < func(nests[index])) {
-        nests[index] = cuckoo;    
-    }
-
-    worst_nests = findWorstNests(func, nests);
-    worst_nests.forEach( nest => {
-        let p = Math.random();
-        if (p < probability) {          
-            nests[nest[1]] = getUniformCoord(l_x1, l_x2);
-        }
-    })
-
-    return nests;
-
-}
-
-
-function findWorstNests(func, nests) {
-    let temp_arr = nests.map( (nest, i) => [func(nest), i]);
-
-    temp_arr.sort((a, b) => {
-        return b[0] - a[0];
-    });
-     
-    temp_arr.length = nests.length / 2;  
-    return temp_arr; 
-}
-
-
-// function bukin(x) {
-//     return 100*Math.sqrt(Math.abs(x[1]-0.01*x[0]*x[0])) + 0.01*Math.abs(x[0] + 10)
-// }
+document.addEventListener('DOMContentLoaded', onContentLoaded);

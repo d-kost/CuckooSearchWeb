@@ -1,12 +1,6 @@
 function setInfo(object) {
     let info_list = document.querySelector('.info-list');
-    // document.querySelector('#function').append(object[func]);
-    // document.querySelector('#limit_x1').append(object[func]);
-    // document.querySelector('#limit_x2').append(object[func]);
-    // document.querySelector('#probability').append(object[func]);
-    // document.querySelector('#iterations').append(object[func]);
-    // document.querySelector('#nests').append(object[func]);
-    // func, limit_x1, limit_x2, iterations, probability, nest_number
+    info_list.innerHTML = '';
 
     for (const key in object) {
         if (object.hasOwnProperty(key)) {
@@ -23,8 +17,9 @@ function setInfo(object) {
 }
 
 function setSolution(coord, value) {
-    document.querySelector('.results__coord').append(`[${coord}]`);
-    document.querySelector('.results__value').append(value);
+    let result = document.querySelector('.results__coord');
+    result.textContent = `[${coord}]`;
+    document.querySelector('.results__value').textContent = value;
 }
 
 function createItem(title, text) {

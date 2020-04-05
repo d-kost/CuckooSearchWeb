@@ -20,6 +20,38 @@ body {
   padding-left: 40px;
 }
 
+.info-block__title {
+  margin-top: 0;
+}
+
+.choose-function {
+  display: flex;
+}
+
+.choose-function__select {
+  padding: 5px;
+  border: 2px solid #cacaca;
+}
+
+.choose-function__select:focus {
+  outline: none;
+}
+
+.choose-function__button {
+  margin-left: 30px;
+  width: 150px;
+  background-color: #fff;
+  border: 2px solid #cacaca;
+}
+
+.choose-function__button:focus {
+  outline: none;
+}
+
+.choose-function__button:active {
+  background-color: #dedede;
+}
+
 .info-list {
   padding-left: 0;
 }

@@ -2,24 +2,20 @@
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-var lower_x1 = -15;
-var upper_x1 = -5;
-var lower_x2 = -3;
-var upper_x2 = 3;
+function execute(f, iterations, probability, nest_number) {
+    var limit_x1 = f.limit_x1;
+    var limit_x2 = f.limit_x2;
 
-var f = library.booth.func;
-execute(f, [lower_x1, upper_x1], [lower_x2, upper_x2], 100, 0.5, 20);
+    var func = f.func;
 
-function execute(func, limit_x1, limit_x2, iterations, probability, nest_number) {
-
-    nests = initNests(limit_x1, limit_x2, nest_number);
-    cuckoo = getUniformCoord(limit_x1, limit_x2);
+    var nests = initNests(limit_x1, limit_x2, nest_number);
+    var cuckoo = getUniformCoord(limit_x1, limit_x2);
 
     var best = findBestSolution(func, nests);
 
     for (var i = 0; i < iterations; i++) {
 
-        nests = process_iteration(func, nests, probability, limit_x1, limit_x2);
+        nests = process_iteration(func, nests, cuckoo, probability, limit_x1, limit_x2);
         var temp = findBestSolution(func, nests);
         if (temp < best) {
             best = temp;
@@ -27,10 +23,6 @@ function execute(func, limit_x1, limit_x2, iterations, probability, nest_number)
     }
 
     var value = func(best);
-
-    console.log('best', best);
-    console.log('func', value);
-
     setSolution(best, value);
 
     var size = 200;
@@ -38,7 +30,6 @@ function execute(func, limit_x1, limit_x2, iterations, probability, nest_number)
     plotFunction(func, limit_x1, limit_x2, size, step_number, best.concat(value));
 
     setInfo({
-        Function: func,
         x1: limit_x1,
         x2: limit_x2,
         'Number of iterations': iterations,
@@ -67,25 +58,23 @@ function findBestSolution(func, nests) {
             best = nest;
         }
     });
-
     return best;
 }
 
-function process_iteration(func, nests, probability, l_x1, l_x2) {
+function process_iteration(func, nests, cuckoo, probability, l_x1, l_x2) {
     var index = Math.floor(Math.random() * nests.length);
 
     if (func(cuckoo) < func(nests[index])) {
         nests[index] = cuckoo;
     }
 
-    worst_nests = findWorstNests(func, nests);
+    var worst_nests = findWorstNests(func, nests);
     worst_nests.forEach(function (nest) {
         var p = Math.random();
         if (p < probability) {
-            nests[nest[1]] = getUniformCoord(l_x1, l_x2);
+            nest = getUniformCoord(l_x1, l_x2);
         }
     });
-
     return nests;
 }
 
@@ -101,20 +90,72 @@ function findWorstNests(func, nests) {
     temp_arr.length = nests.length / 2;
     return temp_arr;
 }
+function onContentLoaded() {
+    setFunctionToSelect(library);
 
-// function bukin(x) {
-//     return 100*Math.sqrt(Math.abs(x[1]-0.01*x[0]*x[0])) + 0.01*Math.abs(x[0] + 10)
-// }
+    applySelectedFucntion();
+
+    document.querySelector('.choose-function__button').addEventListener('click', selectButtonClick);
+}
+
+function selectButtonClick() {
+    applySelectedFucntion();
+}
+
+function applySelectedFucntion() {
+
+    var selected_name = getSelectedOption();
+    var f = getFunctionByName(selected_name);
+    if (f) {
+        execute(f, 100, 0.5, 20);
+    }
+}
+
+function setFunctionToSelect(lib) {
+    var select = document.querySelector('.choose-function__select');
+
+    var selected = true;
+    for (var key in lib) {
+        if (lib.hasOwnProperty(key)) {
+            var element = lib[key];
+
+            select.append(createOption(element.name, selected));
+            selected = false;
+        }
+    }
+}
+
+function createOption(text, selected) {
+    var option = document.createElement('option');
+    option.textContent = text;
+    option.value = text;
+    if (selected) {
+        option.setAttribute('selected', 'selected');
+    }
+    return option;
+}
+
+function getSelectedOption() {
+    var select = document.querySelector('.choose-function__select');
+    return select.options[select.selectedIndex].value;
+}
+
+document.addEventListener('DOMContentLoaded', onContentLoaded);
+
 var library = {
     mccormick: {
-        show: 'sin(x1 + x2) + (x1 - x2)^2 = 1.5x1 + 2.5x2 + 1',
+        name: 'McCormick function',
+        limit_x1: [-4, 4],
+        limit_x2: [-4, 4],
         func: function func(x) {
             return Math.sin(x[0] + x[1]) + Math.pow(x[0] - x[1], 2) - 1.5 * x[0] * 2.5 * x[1] + 1;
         }
     },
 
     goldstein_price: {
-        show: '[1 + (x1 + x2 + 1)^2 * (19 - 14x1 + 3x1^2 - 14x2 + 6x1x2 ' + '+ 3x2^2)] * [30 + (2x1 - 3x2)^2 * (18 - 32x1 + 12x1^2 + 48x2 - ' + '36x1x2 + 27x2^2)]',
+        name: 'Goldstein-Price function',
+        limit_x1: [-2, 2],
+        limit_x2: [-2, 2],
         func: function func(x) {
             var first_part = 1 + Math.pow(x[0] + x[1] + 1, 2) * (19 - 14 * x[0] + 3 * x[0] * x[0] - 14 * x[1] + 6 * x[0] * x[1] + 3 * x[1] * x[1]);
             var second_part = 30 + Math.pow(2 * x[0] - 3 * x[1], 2) * (18 - 32 * x[0] + 12 * x[0] * x[0] + 48 * x[1] - 36 * x[0] * x[1] + 27 * x[1] * x[1]);
@@ -123,28 +164,36 @@ var library = {
     },
 
     schwefel_two_dimensional: {
-        show: '418.9829*2 - (x1*sin(sqrt(abs(x1))) + x2*sin(sqrt(abs(x2))))',
+        name: 'Schwefel function',
+        limit_x1: [-500, 500],
+        limit_x2: [-500, 500],
         func: function func(x) {
             return 418.9829 * 2 - (x[0] * Math.sin(Math.sqrt(Math.abs(x[0]))) + x[1] * Math.sin(Math.sqrt(Math.abs(x[1]))));
         }
     },
 
     rosenbrock_two_dimensional: {
-        show: '[100*(x2 - x1^2)^2 + (x1 - 1)^2]',
+        name: 'Rosenbrock function',
+        limit_x1: [-10, 10],
+        limit_x2: [-6, 6],
         func: function func(x) {
             return 100 * Math.pow(x[1] - x[0] * x[0], 2) + Math.pow(x[0] - 1, 2);
         }
     },
 
     bukin: {
-        show: '100*sqrt(abs(x2 - 0.01x1^2)) + 0.01 * abs(x1 + 10)',
+        name: 'Bukin function N.6',
+        limit_x1: [-15, -5],
+        limit_x2: [-3, 3],
         func: function func(x) {
             return 100 * Math.sqrt(Math.abs(x[1] - 0.01 * x[0] * x[0])) + 0.01 * Math.abs(x[0] + 10);
         }
     },
 
     cross_in_tray: {
-        show: '-0.0001 * ( abs( sin(x1)sin(x2)exp( abs(100 - (sqrt( x1^2 + x2^2 )) / PI) ) ) + 1 )^(0.1)',
+        name: 'Cross-in-Tray function',
+        limit_x1: [-10, 10],
+        limit_x2: [-10, 10],
         func: function func(x) {
             var exp_entry = Math.abs(100 - Math.sqrt(x[0] * x[0] + x[1] * x[1]) / Math.PI);
             var part = Math.sin(x[0]) * Math.sin(x[1]) * Math.exp(exp_entry);
@@ -154,7 +203,9 @@ var library = {
     },
 
     drop_wave: {
-        show: '- ( 1 + cos( 12 * sqrt(x1^2 + x2^2) ) ) / ( 0.5 * (x1^2 + x2^2) + 2 )',
+        name: 'Drop-Wave function',
+        limit_x1: [-5.12, 5.12],
+        limit_x2: [-5.12, 5.12],
         func: function func(x) {
             var first_part = 1 + Math.cos(12 * Math.sqrt(x[0] * x[0] + x[1] * x[1]));
             var second_part = 0.5 * (x[0] * x[0] + x[1] * x[1]) + 2;
@@ -163,7 +214,9 @@ var library = {
     },
 
     eggholder: {
-        show: '',
+        name: 'Eggholder function',
+        limit_x1: [-600, 600],
+        limit_x2: [-600, 600],
         func: function func(x) {
             var first_part = Math.sin(Math.sqrt(Math.abs(x[1] + x[0] / 2 + 47)));
             var second_part = x[0] * Math.sin(Math.sqrt(Math.abs(x[0] - (x[1] + 47))));
@@ -173,15 +226,27 @@ var library = {
     },
 
     booth: {
-        show: '',
+        name: 'Booth function',
+        limit_x1: [-10, 10],
+        limit_x2: [-10, 10],
         func: function func(x) {
             return Math.pow(x[0] + 2 * x[1] - 7, 2) + Math.pow(2 * x[0] + x[1] - 5, 2);
         }
     }
-
 };
+
+function getFunctionByName(name) {
+    for (var key in library) {
+        if (library.hasOwnProperty(key)) {
+            var element = library[key];
+            if (element.name == name) {
+                return element;
+            }
+        }
+    }
+    return null;
+}
 function plotFunction(func, limit_x1, limit_x2, size, step_number, best_coord) {
-    console.log('sdgzdg', best_coord);
 
     var plot_holder = document.getElementById('plot-holder');
     var x1 = [],
@@ -257,10 +322,6 @@ function createCoordForSurface(func, limit_x1, limit_x2, size, step_number) {
     }
 
     return [x1, x2, z];
-
-    // console.log('x1', x1);
-    // console.log('x2', x2);
-    // console.log('z', z);
 }
 
 function getXCoord(l_x1, l_x2, row_number, step_number) {
@@ -288,13 +349,7 @@ function getXCoord(l_x1, l_x2, row_number, step_number) {
 }
 function setInfo(object) {
     var info_list = document.querySelector('.info-list');
-    // document.querySelector('#function').append(object[func]);
-    // document.querySelector('#limit_x1').append(object[func]);
-    // document.querySelector('#limit_x2').append(object[func]);
-    // document.querySelector('#probability').append(object[func]);
-    // document.querySelector('#iterations').append(object[func]);
-    // document.querySelector('#nests').append(object[func]);
-    // func, limit_x1, limit_x2, iterations, probability, nest_number
+    info_list.innerHTML = '';
 
     for (var key in object) {
         if (object.hasOwnProperty(key)) {
@@ -309,8 +364,9 @@ function setInfo(object) {
 }
 
 function setSolution(coord, value) {
-    document.querySelector('.results__coord').append('[' + coord + ']');
-    document.querySelector('.results__value').append(value);
+    var result = document.querySelector('.results__coord');
+    result.textContent = '[' + coord + ']';
+    document.querySelector('.results__value').textContent = value;
 }
 
 function createItem(title, text) {
